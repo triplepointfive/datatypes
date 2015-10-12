@@ -1,5 +1,20 @@
 {-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE FlexibleInstances #-}
 module ChurchNumbers where
+
+class Boolean a where
+  tru :: a -> a -> a
+  tru = \ t -> \ f -> t
+
+  fls :: a -> a -> a
+  fls = \ t -> \ f -> f
+
+  test :: (a -> a -> a) -> a -> a -> a
+  test = \ l -> \ m -> \ n -> l m n
+
+instance (Boolean a) => (Boolean (a -> a -> a))
+
+instance Boolean Bool
 
 class Number a where
   c0, c1, c2, c3 :: (a -> a) -> a -> a
@@ -16,6 +31,8 @@ class Number a where
 
   times :: ((a -> a) -> a -> a) -> ((a -> a) -> a -> a) -> (a -> a) -> a -> a
   times = \ m -> \ n -> \ s -> \ z -> m (n s) z
+
+instance (Number a) => (Number ((a -> a) -> a -> a))
 
 instance Number Integer
 
