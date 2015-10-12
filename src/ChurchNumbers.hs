@@ -1,3 +1,4 @@
+{-# LANGUAGE RankNTypes #-}
 module ChurchNumbers where
 
 class Number a where
@@ -16,4 +17,11 @@ class Number a where
   times :: ((a -> a) -> a -> a) -> ((a -> a) -> a -> a) -> (a -> a) -> a -> a
   times = \ m -> \ n -> \ s -> \ z -> m (n s) z
 
-instance Number Int
+instance Number Integer
+
+fix :: (a -> a) -> a
+fix = \ f -> f (fix f)
+
+fac = fix g
+  where
+    g = \ fct -> \ n -> if n == 0 then 1 else n * fct (n - 1)
