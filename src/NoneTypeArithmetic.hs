@@ -1,9 +1,11 @@
 {-# LANGUAGE DeriveAnyClass #-}
-{-# LANGUAGE BangPatterns #-}
+{-# LANGUAGE DeriveGeneric #-}
 module NoneTypeArithmetic where
 
 import Control.Exception (catch, throw, Exception, evaluate)
 import Data.Typeable (Typeable)
+import Control.DeepSeq (($!!), NFData)
+import GHC.Generics (Generic)
 
 data NoRuleApplies = NoRuleApplies deriving (Show, Typeable, Exception)
 
@@ -15,7 +17,7 @@ data Term
     | TmSucc Term
     | TmPred Term
     | TmIsZero Term
-    deriving Show
+    deriving (Show, NFData, Generic)
 
 isNumericVal :: Term -> Bool
 isNumericVal t = case t of
@@ -43,4 +45,4 @@ eval1 (TmIsZero t1)           = let t1' = eval1 t1 in TmIsZero t1'
 eval1 _                       = throw NoRuleApplies
 
 eval :: Term -> IO Term
-eval t = (let !t' = eval1 t in eval t') `catch` (\ NoRuleApplies -> return t)
+eval t = (let t' = eval1 t in eval $!! t') `catch` (\ NoRuleApplies -> return t)
